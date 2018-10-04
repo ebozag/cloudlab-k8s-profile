@@ -40,7 +40,7 @@ python-pip automake autoconf libtool indent vim tmux ctags
 ##sudo apt-get -y install  docker-engine kubelet kubeadm kubectl kubernetes-cni golang-go jq 
 version=$(echo $(echo $K8SVERSION |sed 's/v//')-00)
 sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
-sudo apt-get -y install  docker-engine kubernetes-cni golang-go jq 
+sudo apt-get -y install  docker-engine=1.13.1-0~ubuntu-xenial kubernetes-cni=0.6.0-00 golang-go jq 
 # Install version-specific Kubelet - Read https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl
 ##curl -LO https://storage.googleapis.com/kubernetes-release/release/$K8SVERSION/bin/linux/amd64/kubectl
 ##chmod +x ./kubectl
