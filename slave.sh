@@ -33,7 +33,7 @@ python-pip automake autoconf libtool indent vim tmux jq
 ##sudo apt-get -y install  docker-engine kubelet kubeadm kubectl kubernetes-cni golang-go jq
 version=$(echo $(echo $K8SVERSION |sed 's/v//')-00)
 sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
-sudo apt-get -y install  docker-engine=1.13.1-0~ubuntu-xenial kubernetes-cni=0.6.0-00 golang-go jq 
+sudo apt-get -y install  docker-engine=1.11.2-0~xenial kubernetes-cni=0.6.0-00 golang-go jq 
 
 sudo docker version
 sudo swapoff -a
