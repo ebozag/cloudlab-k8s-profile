@@ -18,25 +18,22 @@ mkdir -p $KUBEHOME && cd $KUBEHOME
 export KUBECONFIG=$KUBEHOME/admin.conf
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
 
 cd $WORKINGDIR
-##git clone git@gitlab.flux.utah.edu:licai/deepstitch.git
 
-sudo apt-get update
-sudo apt-get -y install build-essential libffi-dev python python-dev  \
-python-pip automake autoconf libtool indent vim tmux jq
+sudo apt-get update -y
+sudo apt autoremove -y
+#sudo apt-get -y install build-essential libffi-dev python python-dev  \
+#python-pip automake autoconf libtool indent vim tmux jq
 
-# learn from this: https://blog.csdn.net/yan234280533/article/details/75136630
-# learn from this: https://blog.csdn.net/yan234280533/article/details/75136630
-# more info should see: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
-##sudo apt-get -y install  docker-engine kubelet kubeadm kubectl kubernetes-cni golang-go jq
 version=$(echo $(echo $K8SVERSION |sed 's/v//')-00)
-sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
-sudo apt-get -y install  docker-engine=1.11.2-0~xenial kubernetes-cni=0.6.0-00 golang-go jq 
-
+sudo apt-get -y install  docker-engine=1.11.2-0~xenial kubernetes-cni=0.6.0-00 # golang-go jq 
 sudo docker version
 sudo swapoff -a
+
+sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
 
 master_token=''
 while [ -z $master_token ] 
