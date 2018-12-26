@@ -32,22 +32,19 @@ sudo apt-get -y install software-properties-common
 sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get -y update
-sudo apt-get -y install build-essential libffi-dev python python-dev  \
-python-pip automake autoconf libtool indent vim tmux ctags
+#sudo apt-get -y install build-essential libffi-dev python python-dev  \
+#python-pip automake autoconf libtool indent vim tmux ctags
 
 # learn from this: https://blog.csdn.net/yan234280533/article/details/75136630
 # more info should see: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 ##sudo apt-get -y install  docker-engine kubelet kubeadm kubectl kubernetes-cni golang-go jq 
 version=$(echo $(echo $K8SVERSION |sed 's/v//')-00)
-sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
-sudo apt-get -y install docker-engine=1.11.2-0~xenial kubernetes-cni=0.6.0-00 golang-go jq 
-# Install version-specific Kubelet - Read https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl
-##curl -LO https://storage.googleapis.com/kubernetes-release/release/$K8SVERSION/bin/linux/amd64/kubectl
-##chmod +x ./kubectl
-##sudo mv ./kubectl /usr/local/bin/kubectl
-
+sudo apt-get -y install docker-engine=1.11.2-0~xenial kubernetes-cni=0.6.0-00 #golang-go jq 
 sudo docker version
 sudo swapoff -a
+
+sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
+
 sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version="$K8SVERSION" --ignore-preflight-errors='KubeletVersion'
 
 # result will be like:  kubeadm join 155.98.36.111:6443 --token i0peso.pzk3vriw1iz06ruj --discovery-token-ca-cert-hash sha256:19c5fdee6189106f9cb5b622872fe4ac378f275a9d2d2b6de936848215847b98
