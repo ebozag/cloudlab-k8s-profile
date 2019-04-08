@@ -118,3 +118,10 @@ echo "And this is the dashboard credential: $dashboard_credential"
 # to know how much time it takes to instantiate everything.
 echo "Finishing..."
 date
+
+#Rename script file to avoid reinstall on boot
+cd /mnt/extra/
+mv master.sh master.sh-old
+mv slave.sh slave.sh-old
+cd
+
