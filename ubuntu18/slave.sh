@@ -55,3 +55,10 @@ sudo systemctl restart kubelet.service
 # if it complains some file already exist, remove those. [ERROR FileAvailable--etc-kubernetes-pki-ca.crt]: /etc/kubernetes/pki/ca.crt already exists
 
 date
+
+#Rename script file to avoid reinstall on boot
+cd /mnt/extra/
+mv master.sh master.sh-old
+mv slave.sh slave.sh-old
+cd
+
