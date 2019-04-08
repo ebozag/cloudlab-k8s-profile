@@ -38,7 +38,7 @@ sudo apt-get -y update
 # more info should see: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 ##sudo apt-get -y install  docker-engine kubelet kubeadm kubectl kubernetes-cni golang-go jq 
 version=$(echo $(echo $K8SVERSION |sed 's/v//')-00)
-sudo apt install -y docker.io=18.06.1-0ubuntu1~18.04.1 
+sudo apt install -y docker.io=18.06.1-0ubuntu1.2~18.04.1 
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo apt-get -y kubernetes-cni=0.6.0-00 golang-go jq 
