@@ -54,6 +54,7 @@ sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version="$K8SVE
 # https://github.com/kubernetes/kubernetes/issues/44665
 sudo cp /etc/kubernetes/admin.conf $KUBEHOME/
 sudo chown ${username}:${usergid} $KUBEHOME/admin.conf
+sudo chmod r+o $KUBEHOME/admin.conf
 
 sudo kubectl create -f $DEPLOY_CONFIG/kube-flannel-rbac.yml
 sudo kubectl create -f $DEPLOY_CONFIG/kube-flannel.yml
