@@ -41,7 +41,7 @@ sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
 master_token=''
 while [ -z $master_token ] 
 do
-    master_token=`ssh -o StrictHostKeyChecking=no m "export KUBECONFIG='/mnt/extra/kube/admin.conf' &&   kubeadm token list |grep authentication | cut -d' ' -f 1"`;
+    master_token=`ssh -o StrictHostKeyChecking=no eboza@m "export KUBECONFIG='/mnt/extra/kube/admin.conf' &&   kubeadm token list |grep authentication | cut -d' ' -f 1"`;
     sleep 1;
 done
 sudo kubeadm join m:6443 --token $master_token --discovery-token-unsafe-skip-ca-verification 
