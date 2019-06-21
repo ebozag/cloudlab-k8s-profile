@@ -76,7 +76,8 @@ CNIVERSION="${KUBECNIV}-00"
 DOCKERVERSION="${DOCKERV}-0ubuntu1.2~18.04.1"
 
 # disable swap
-SWAPFILES=$(grep swap /etc/fstab | sed '/^#/ d' |cut -f1 -d' ')
+#SWAPFILES=$(grep swap /etc/fstab | sed '/^#/ d' |cut -f1 -d' ')
+SWAPFILES=$(grep swap /etc/fstab | sed '/^#/ d' |cut -f1 )
 if [ ! -z $SWAPFILES ]; then
   for SWAPFILE in $SWAPFILES
   do
@@ -190,7 +191,7 @@ subjects:
 EOF
 
   # start cluster (make sure CIDR is enabled with the flag)
-  kubeadm init --config "${WORKINGDIR}/config.yaml"
+  sudo kubeadm init --config "${WORKINGDIR}/config.yaml"
 fi
 
 
