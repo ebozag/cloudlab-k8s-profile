@@ -16,10 +16,10 @@ cd $WORKINGDIR
 exec >> ${WORKINGDIR}/deploy.log
 exec 2>&1
 
-KUBEHOME="${WORKINGDIR}/kube/"
+KUBEHOME="${WORKINGDIR}/.kube/"
 DEPLOY_CONFIG="${WORKINGDIR}/cloudlab-k8s-profile/$K8SVERSION/kube-deploy-yaml/"
 mkdir -p $KUBEHOME && cd $KUBEHOME
-export KUBECONFIG=$KUBEHOME/admin.conf
+export KUBECONFIG=$KUBEHOME/config
 
 cd $WORKINGDIR
 
@@ -111,6 +111,19 @@ sudo apt-get install -y kubernetes-cni=${CNIVERSION}
 sudo apt-get install -y --allow-unauthenticated kubeadm=${KUBEVERSION} kubelet=${KUBEVERSION} kubectl=${KUBEVERSION}
 sudo apt-mark hold kubernetes-cni kubelet kubeadm kubectl
 
+# Load kernel modules 
+sudo modprobe -- ip_vs
+sudo modprobe -- ip_vs_rr
+sudo modprobe -- ip_vs_wrr
+sudo modprobe -- ip_vs_sh
+sudo modprobe -- nf_conntrack_ipv4
+sudo modprobe -- nf_conntrack_ipv6
+sudo modprobe -- nf_conntrack_proto_sctp    ### Probably will give an error, as recent versions include this as part of the Kernel.
+
+# Restart docker and configure to start at boot
+sudo service docker restart
+sudo systemctl enable docker.service
+
 # test access to k8s docker registry
 sudo kubeadm config images pull
 
@@ -192,8 +205,62 @@ EOF
 
   # start cluster (make sure CIDR is enabled with the flag)
   sudo kubeadm init --config "${WORKINGDIR}/config.yaml"
-fi
 
+  # install Helm
+  HELMV=${INFRA_HELM_VERSION}
+  HELMVERSION=${HELMV}
+  cd "${WORKINGDIR}"
+  mkdir Helm
+  cd Helm
+  wget https://storage.googleapis.com/kubernetes-helm/helm-v${HELMVERSION}-linux-amd64.tar.gz
+  tar -xvf helm-v${HELMVERSION}-linux-amd64.tar.gz
+  sudo mv linux-amd64/helm /usr/local/bin/helm
+
+  # set up kubectl credential and config
+  sudo cp /etc/kubernetes/admin.conf $KUBEHOME/
+  sudo chown ${username}:${usergid} $KUBEHOME/config
+  sudo chmod g+r $KUBEHOME/config
+
+  # at this point we should be able to use kubectl
+  kubectl get pods --all-namespaces
+
+  # install flannel
+  kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml
+
+
+  # waiting for all 8 kube-system pods to be in running state
+  # (at this point, minions have not joined yet)
+###  wait_for_pods_running 8 kube-system
+
+  # if running a single node cluster, need to enable master node to run pods
+  kubectl taint nodes --all node-role.kubernetes.io/master-
+
+  cd "${WORKINGDIR}"
+  # install RBAC for Helm
+  kubectl create -f rbac-config.yaml
+
+
+  rm -rf "${WORKINGDIR}/.helm"
+  helm init --service-account tiller
+  export HELM_HOME="${WORKINGDIR}/.helm"
+
+  # waiting for tiller pod to be in running state
+###  wait_for_pods_running 1 kube-system tiller-deploy
+
+  while ! helm version; do
+    echo "Waiting for Helm to be ready"
+    sleep 15
+  done
+
+  # install ingress controller db-less kong
+  helm install stable/kong --set ingressController.enabled=true --set postgresql.enabled=false --set env.database=off
+
+
+  echo "Starting an NC TCP server on port 29999 to indicate we are ready"
+  nc -l -p 29999 &
+
+  echo "Done with master node setup"
+fi
 
 echo "FINISHED part copied from RIC"
 exit 0
