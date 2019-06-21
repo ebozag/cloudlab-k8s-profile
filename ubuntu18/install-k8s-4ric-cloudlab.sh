@@ -85,12 +85,12 @@ if [ ! -z $SWAPFILES ]; then
       echo "disabling swap file $SWAPFILE"
       if [[ $SWAPFILE == UUID* ]]; then
         UUID=$(echo $SWAPFILE | cut -f2 -d'=')
-        swapoff -U $UUID
+        sudo swapoff -U $UUID
       else
-        swapoff $SWAPFILE
+        sudo swapoff $SWAPFILE
       fi
       # edit /etc/fstab file, remove line with /swapfile
-      sed -i -e "/$SWAPFILE/d" /etc/fstab
+      sudo sed -i -e "/$SWAPFILE/d" /etc/fstab
     fi
   done
 fi
