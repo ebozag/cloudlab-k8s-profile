@@ -191,7 +191,7 @@ EOF
 
   # start cluster (make sure CIDR is enabled with the flag)
   kubeadm init --config "${WORKINGDIR}/config.yaml"
-
+fi
 
 
 echo "FINISHED part copied from RIC"
