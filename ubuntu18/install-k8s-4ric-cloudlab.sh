@@ -217,7 +217,7 @@ EOF
   sudo mv linux-amd64/helm /usr/local/bin/helm
 
   # set up kubectl credential and config
-  sudo cp /etc/kubernetes/admin.conf $KUBEHOME/
+  sudo cp /etc/kubernetes/admin.conf $KUBEHOME/config
   sudo chown ${username}:${usergid} $KUBEHOME/config
   sudo chmod g+r $KUBEHOME/config
 
