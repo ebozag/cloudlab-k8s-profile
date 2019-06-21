@@ -126,7 +126,7 @@ else
 
   # create kubenetes config file
   if [[ ${KUBEV} == 1.13.* ]]; then
-    cat <<EOF >/root/config.yaml
+    cat <<EOF >"${WORKINGDIR}/config.yaml"
 apiVersion: kubeadm.k8s.io/v1alpha3
 kubernetesVersion: v${KUBEV}
 kind: ClusterConfiguration
@@ -144,7 +144,7 @@ mode: ipvs
 EOF
 
   elif [[ ${KUBEV} == 1.14.* ]]; then
-    cat <<EOF >/root/config.yaml
+    cat <<EOF >"${WORKINGDIR}/config.yaml"
 apiVersion: kubeadm.k8s.io/v1beta1
 kubernetesVersion: v${KUBEV}
 kind: ClusterConfiguration
@@ -168,7 +168,7 @@ EOF
 
 
   # create a RBAC file for helm (tiller)
-  cat <<EOF > /root/rbac-config.yaml
+  cat <<EOF > "${WORKINGDIR}/rbac-config.yaml"
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -190,7 +190,7 @@ subjects:
 EOF
 
   # start cluster (make sure CIDR is enabled with the flag)
-  kubeadm init --config /root/config.yaml
+  kubeadm init --config "${WORKINGDIR}/config.yaml"
 
 
 
