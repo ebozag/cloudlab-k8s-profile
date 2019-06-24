@@ -1,4 +1,21 @@
 #!/bin/bash
+################################################################################
+#   Copyright (c) 2019 AT&T Intellectual Property.                             #
+#   Copyright (c) 2019 Nokia.                                                  #
+#   Copyright (c) 2019 Escuela Superior Politecnica del Litoral - ESPOL.       #
+#                                                                              #
+#   Licensed under the Apache License, Version 2.0 (the "License");            #
+#   you may not use this file except in compliance with the License.           #
+#   You may obtain a copy of the License at                                    #
+#                                                                              #
+#       http://www.apache.org/licenses/LICENSE-2.0                             #
+#                                                                              #
+#   Unless required by applicable law or agreed to in writing, software        #
+#   distributed under the License is distributed on an "AS IS" BASIS,          #
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   #
+#   See the License for the specific language governing permissions and        #
+#   limitations under the License.                                             #
+################################################################################
 #set -u
 #set -x
 
@@ -30,6 +47,13 @@ INFRA_DOCKER_VERSION="18.06.1"
 INFRA_K8S_VERSION="1.13.3"
 INFRA_CNI_VERSION="0.6.0"
 INFRA_HELM_VERSION="2.12.3"
+
+#### This is how I used to install K8s packages using the version received by the script.
+
+##version=$(echo $(echo $K8SVERSION |sed 's/v//')-00)
+##sudo apt-get install -y kubernetes-cni=0.6.0-00 golang-go jq 
+##sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
+##sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version="$K8SVERSION" --ignore-preflight-errors='KubeletVersion'
 
 ### ric-infra/00-Kubernetes/etc/env.rc
 # customize the following repo info to local infrastructure
@@ -263,6 +287,14 @@ EOF
 fi
 
 echo "FINISHED part copied from RIC"
+
+#Rename script file to avoid reinstall on boot
+cd /mnt/extra/
+mv install-k8s-4ric-cloudlab.sh install-k8s-4ric-cloudlab.sh-old
+mv master.sh master.sh-old
+mv slave.sh slave.sh-old
+cd
+
 exit 0
 ###############
 ###############
@@ -270,96 +302,6 @@ exit 0
 ###############
 
 
-version=$(echo $(echo $K8SVERSION |sed 's/v//')-00)
-sudo apt install -y docker.io=18.06.1-0ubuntu1.2~18.04.1 
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo apt-get install -y kubernetes-cni=0.6.0-00 golang-go jq 
-sudo docker version
-sudo swapoff -a
-
-sudo apt-get install -qy kubelet=$version kubectl=$version kubeadm=$version
-sudo kubeadm config images pull
-sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version="$K8SVERSION" --ignore-preflight-errors='KubeletVersion'
-
-# result will be like:  kubeadm join 155.98.36.111:6443 --token i0peso.pzk3vriw1iz06ruj --discovery-token-ca-cert-hash sha256:19c5fdee6189106f9cb5b622872fe4ac378f275a9d2d2b6de936848215847b98
-
-# https://github.com/kubernetes/kubernetes/issues/44665
-sudo cp /etc/kubernetes/admin.conf $KUBEHOME/
-sudo chown ${username}:${usergid} $KUBEHOME/admin.conf
-sudo chmod g+r $KUBEHOME/admin.conf
-
-sudo kubectl create -f $DEPLOY_CONFIG/kube-flannel-rbac.yml
-sudo kubectl create -f $DEPLOY_CONFIG/kube-flannel.yml
-
-# use this to enable autocomplete
-source <(kubectl completion bash)
-
-# kubectl get nodes --kubeconfig=${KUBEHOME}/admin.conf -s https://155.98.36.111:6443
-# Install dashboard: https://github.com/kubernetes/dashboard
-#sudo kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
- 
-# run the proxy to make the dashboard portal accessible from outside
-#sudo kubectl proxy  --kubeconfig=${KUBEHOME}/admin.conf  &
-
-# https://github.com/kubernetes/dashboard/wiki/Creating-sample-user
-kubectl create -f $DEPLOY_CONFIG/create-cluster-role-binding-admin.yaml  
-kubectl create -f $DEPLOY_CONFIG/create-service-account-admin-uesr-dashboard.yaml
-# to print the token, use this cmd below to paste into the browser.
-# kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') |grep token: | awk '{print $2}'
-
-# jid for json parsing.
-export GOPATH=${WORKINGDIR}/go/gopath
-mkdir -p $GOPATH
-export PATH=$PATH:$GOPATH/bin
-sudo go get -u github.com/simeji/jid/cmd/jid
-sudo go build -o /usr/bin/jid github.com/simeji/jid/cmd/jid
-
-# install helm in case we needs it.
-##wget https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz
-##tar xf helm-v2.9.1-linux-amd64.tar.gz
-##sudo cp linux-amd64/helm /usr/local/bin/helm
-
-#helm init
-# https://docs.helm.sh/using_helm/#role-based-access-control
-##kubectl create serviceaccount --namespace kube-system tiller
-##kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-##kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'      
-##helm init --service-account tiller --upgrade
-
-#source <(helm completion bash)
-
-# Wait till the slave nodes get joined and update the kubelet daemon successfully
-
-#echo "Waiting for slaves nodes..."
-#nodes=(`ssh -o StrictHostKeyChecking=no ${username}@ops.emulab.net "/usr/testbed/bin/node_list -p -e ${projectid},${experimentid};"`)
-#node_cnt=${#nodes[@]}
-#joined_cnt=$(( `kubectl get nodes |wc -l` - 1 ))
-#while [ $node_cnt -ne $joined_cnt ]
-#do 
-#    joined_cnt=$(( `kubectl get nodes |wc -l` - 1 ))
-#    sleep 1
-#done
-
-echo "Kubernetes is ready at: http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login"
-
-# optional address
-echo "Or, another access option"
-echo "kubernetes dashboard endpoint: $dashboard_endpoint"
-# dashboard credential
-echo "And this is the dashboard credential: $dashboard_credential"
-
-# to know how much time it takes to instantiate everything.
-echo "Finishing..."
-date
-
-#Rename script file to avoid reinstall on boot
-cd /mnt/extra/
-mv master.sh master.sh-old
-mv slave.sh slave.sh-old
-cd
-
-#!/bin/bash -x
 ################################################################################
 #   Copyright (c) 2019 AT&T Intellectual Property.                             #
 #   Copyright (c) 2019 Nokia.                                                  #
