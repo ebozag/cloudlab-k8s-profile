@@ -33,6 +33,9 @@ cd $WORKINGDIR
 exec >> ${WORKINGDIR}/deploy.log
 exec 2>&1
 
+### Show K8s requested version
+echo "K8s requested version = $1"
+
 KUBEHOME="${WORKINGDIR}/.kube/"
 DEPLOY_CONFIG="${WORKINGDIR}/cloudlab-k8s-profile/$K8SVERSION/kube-deploy-yaml/"
 mkdir -p $KUBEHOME && cd $KUBEHOME
