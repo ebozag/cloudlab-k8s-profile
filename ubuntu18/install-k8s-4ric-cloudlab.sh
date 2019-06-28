@@ -141,6 +141,9 @@ sudo apt-get install -y curl jq netcat docker.io=${DOCKERVERSION}
 sudo apt-get install -y kubernetes-cni=${CNIVERSION}
 sudo apt-get install -y --allow-unauthenticated kubeadm=${KUBEVERSION} kubelet=${KUBEVERSION} kubectl=${KUBEVERSION}
 sudo apt-mark hold kubernetes-cni kubelet kubeadm kubectl
+
+### Disable AppArmor, as it doesn't allow to create MariaDB container. 
+### See Troubleshooting section on https://mariadb.com/kb/en/library/installing-and-using-mariadb-via-docker/
 sudo apt-get purge --auto-remove apparmor
 
 # Load kernel modules 
