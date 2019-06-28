@@ -144,7 +144,7 @@ sudo apt-mark hold kubernetes-cni kubelet kubeadm kubectl
 
 ### Disable AppArmor, as it doesn't allow to create MariaDB container. 
 ### See Troubleshooting section on https://mariadb.com/kb/en/library/installing-and-using-mariadb-via-docker/
-sudo apt-get purge --auto-remove apparmor
+sudo apt-get purge -y --auto-remove apparmor
 
 # Load kernel modules 
 sudo modprobe -- ip_vs
