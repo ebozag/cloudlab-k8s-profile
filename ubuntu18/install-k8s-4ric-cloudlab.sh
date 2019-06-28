@@ -141,6 +141,7 @@ sudo apt-get install -y curl jq netcat docker.io=${DOCKERVERSION}
 sudo apt-get install -y kubernetes-cni=${CNIVERSION}
 sudo apt-get install -y --allow-unauthenticated kubeadm=${KUBEVERSION} kubelet=${KUBEVERSION} kubectl=${KUBEVERSION}
 sudo apt-mark hold kubernetes-cni kubelet kubeadm kubectl
+sudo apt-get purge --auto-remove apparmor
 
 # Load kernel modules 
 sudo modprobe -- ip_vs
