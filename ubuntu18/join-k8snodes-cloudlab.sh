@@ -35,7 +35,12 @@ do
 done
 
 echo "Waiting for nodes to join..."
-sleep 2
+while [ $(kubectl get nodes|grep -c NotReady) -gt 0 ]
+do
+    echo "Waiting for $(kubectl get nodes|grep -c NotReady) node(s) to join..."
+    sleep 5
+done
+echo "All nodes has been restarted: "
 kubectl get nodes
 
 echo "Initialization finished."
