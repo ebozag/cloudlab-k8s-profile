@@ -137,7 +137,15 @@ echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/a
 sudo apt-get -y update
 #### TODO instal low latency kernel
 ### sudo apt-get install -y linux-image-4.15.0-45-lowlatency curl jq netcat docker.io=${DOCKERVERSION}
-sudo apt-get install -y curl jq netcat docker.io=${DOCKERVERSION}
+sudo apt-get install -y curl jq netcat 
+### Install docker, and change the default folder from /usr/lib/docker to /mnt/extra/docker
+sudo apt-get install -y docker.io=${DOCKERVERSION}
+sudo mkdir /mnt/extra/docker
+sudo chown root:root /mnt/extra/docker
+sudo chmod 711 /mnt/extra/docker
+sudo sed -i 's/\-H fd/\-g \/mnt\/extra\/docker \-H fd/g' /lib/systemd/system/docker.service
+
+### Install Kubernetes
 sudo apt-get install -y kubernetes-cni=${CNIVERSION}
 sudo apt-get install -y --allow-unauthenticated kubeadm=${KUBEVERSION} kubelet=${KUBEVERSION} kubectl=${KUBEVERSION}
 sudo apt-mark hold kubernetes-cni kubelet kubeadm kubectl
