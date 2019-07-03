@@ -40,8 +40,16 @@ do
     echo "Waiting for $(kubectl get nodes|grep -c NotReady) node(s) to join..."
     sleep 5
 done
+
+# Label each of the slaves nodes
+for hostname in $hostnames
+do
+    echo "Labeling node: ${hostname}.${clusterdomain}..." 
+    kubectl label nodes ${hostname}.${clusterdomain} nodelabel=${hostname}
+done
+
 echo "All nodes has been joined: "
-kubectl get nodes
+kubectl get nodes --show-labels
 
 echo "Initialization finished."
 exit 0
