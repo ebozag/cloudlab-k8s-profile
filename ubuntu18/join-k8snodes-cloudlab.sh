@@ -40,7 +40,7 @@ do
     echo "Waiting for $(kubectl get nodes|grep -c NotReady) node(s) to join..."
     sleep 5
 done
-echo "All nodes has been restarted: "
+echo "All nodes has been joined: "
 kubectl get nodes
 
 echo "Initialization finished."
