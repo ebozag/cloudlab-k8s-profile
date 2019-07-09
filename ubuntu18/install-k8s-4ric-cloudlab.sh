@@ -139,7 +139,11 @@ sudo apt-get -y update
 ### sudo apt-get install -y linux-image-4.15.0-45-lowlatency curl jq netcat docker.io=${DOCKERVERSION}
 sudo apt-get install -y curl jq netcat 
 ### Install docker, and change the default folder from /usr/lib/docker to /mnt/extra/docker
-sudo apt-get install -y docker.io=${DOCKERVERSION}
+
+##TO-DO: fix the docker version
+####sudo apt-get install -y docker.io=${DOCKERVERSION}
+sudo apt-get install -y docker.io
+
 sudo mkdir /mnt/extra/docker
 sudo chown root:root /mnt/extra/docker
 sudo chmod 711 /mnt/extra/docker
