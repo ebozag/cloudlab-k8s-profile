@@ -45,7 +45,7 @@ done
 for hostname in $hostnames
 do
     echo "Labeling node: ${hostname}.${clusterdomain}..." 
-    kubectl label nodes ${hostname}.${clusterdomain} nodelabel=${hostname} --overwrite true
+    kubectl label nodes ${hostname}.${clusterdomain} nodelabel=${hostname} --overwrite=true
 done
 
 echo "All nodes has been joined: "
