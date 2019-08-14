@@ -251,7 +251,8 @@ subjects:
 EOF
 
   # start cluster (make sure CIDR is enabled with the flag)
-  sudo kubeadm init --config "${WORKINGDIR}/config.yaml"
+  ##sudo kubeadm init --config "${WORKINGDIR}/config.yaml"
+  sudo kubeadm init --apiserver-advertise-address 10.10.1.1 --service-cidr 10.96.0.0/12  --pod-network-cidr 10.244.0.0/16 ### Use this to specify the Iface
 
   # install Helm
   HELMV=${INFRA_HELM_VERSION}
@@ -272,7 +273,8 @@ EOF
   kubectl get pods --all-namespaces
 
   # install flannel
-  kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml
+  ##kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml
+  kubectl apply -f kube-flannel-useInternalIface.yaml ### Changed to specify the IFace
 
 
   # waiting for all 8 kube-system pods to be in running state
